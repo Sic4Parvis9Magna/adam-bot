@@ -3,9 +3,9 @@ from os import getenv
 import http.client as client
 from random import randrange
 
-import constants
-import github_client as github
-from mal_client import get_results_for_genre
+import adam.constants
+import adam.github_client as github
+from adam.mal_client import get_results_for_genre
 
 BASE_URL_TEMPLATE = "/bot{token}"
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -91,7 +91,7 @@ def sendGintamaPoll(chat_id):
     body = {
         "chat_id" : chat_id,
         "question": get_rn_gin(),
-        "options": ["Y", "N", "22-30", "23-00", "23-30"],
+        "options": ["Y", "N", "22-30", "23-00", "23-15", "23-30"],
         "allows_multiple_answers": True,
         "is_anonymous": False
     }

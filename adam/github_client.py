@@ -1,5 +1,5 @@
 import http.client as client
-import github_api_constants as HUB_API
+import adam.github_api_constants as HUB_API
 import json
 import datetime
 import base64
@@ -85,7 +85,7 @@ def find_latest_commit(commits: list) -> str:
 
 
 def get_record_number(content: str) -> str:
-    p = re.compile('Record-(\d{3})', re.MULTILINE)
+    p = re.compile(r'Record-(\d{3})', re.MULTILINE)
     find_items = p.findall(content)
 
     if len(find_items) == 0:
@@ -208,15 +208,15 @@ def parse_record(text:str) -> dict:
     res_link = None
     res_tags = []
 
-    p_title = re.compile('title:\s?\[([^[]+)\]') 
+    p_title = re.compile(r'title:\s?\[([^[]+)\]') 
     m_title = p_title.findall(text)
     res_title = m_title[0] if m_title  else 'undefined'  
 
-    p_link = re.compile('link:\s?\[([^[]+)\]') 
+    p_link = re.compile(r'link:\s?\[([^[]+)\]') 
     m_link = p_link.findall(text)
     res_link = m_link[0] if m_link  else 'undefined'  
 
-    p_tags = re.compile('#(\w+)') 
+    p_tags = re.compile(r'#(\w+)') 
     m_tags = p_tags.findall(text)
     all_tags = m_tags if m_tags  else []  
 
@@ -230,7 +230,7 @@ def parse_record(text:str) -> dict:
 
 
 def parse_github_path(text: str) -> str:
-    p_title = re.compile('#gitpath:\s?\[([^[]+)\]') 
+    p_title = re.compile(r'#gitpath:\s?\[([^[]+)\]') 
     m_title = p_title.findall(text)
     
     return m_title[0] if m_title  else 'undefined'

@@ -1,4 +1,4 @@
-import constants
+import adam.constants
 
 import json
 from http.client import HTTPConnection, HTTPResponse
