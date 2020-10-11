@@ -1,6 +1,8 @@
 JIKAN_API_HOST = "api.jikan.moe"
 JIKAN_API_VERSION = "/v3"
 
+COMMAND_NOT_FOUND = 'Unresolved command =( : '
+
 DIR_LIST = [
     "devops/devops-links.MD",
     "algorithms/algorithms-links.MD",

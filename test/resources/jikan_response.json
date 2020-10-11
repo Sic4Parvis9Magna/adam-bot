@@ -1,0 +1,53 @@
+{
+    "request_hash": "request:search:ebf9690d117311779958b6113a95476ee6f6edee",
+    "request_cached": false,
+    "request_cache_expiry": 432000,
+    "results": [
+        {
+            "mal_id": 5525,
+            "url": "https:\/\/myanimelist.net\/anime\/5525\/07-Ghost",
+            "image_url": "https:\/\/cdn.myanimelist.net\/images\/anime\/3\/22605.jpg?s=dfe3054d81745bcdd54940f94c1a2965",
+            "title": "07-Ghost",
+            "airing": false,
+            "synopsis": "Barsburg Empire's Military Academy is known for training elites who bring victory to the empire. Students of the academy freely utilize an ability called \"Zaiphon\" to fight, while the types of Zaiphon...",
+            "type": "TV",
+            "episodes": 25,
+            "score": 7.32,
+            "start_date": "2009-04-07T00:00:00+00:00",
+            "end_date": "2009-09-22T00:00:00+00:00",
+            "members": 164494,
+            "rated": "PG-13"
+        },
+        {
+            "mal_id": 32998,
+            "url": "https:\/\/myanimelist.net\/anime\/32998\/91_Days",
+            "image_url": "https:\/\/cdn.myanimelist.net\/images\/anime\/13\/80515.jpg?s=41658544d7fb3927ff22f361b3ac9260",
+            "title": "91 Days",
+            "airing": false,
+            "synopsis": "As a child living in the town of Lawless, Angelo Lagusa has witnessed a tragedy: his parents and younger brother have been mercilessly slaughtered by the Vanetti mafia family. Losing everything he hol...",
+            "type": "TV",
+            "episodes": 12,
+            "score": 7.87,
+            "start_date": "2016-07-09T00:00:00+00:00",
+            "end_date": "2016-10-01T00:00:00+00:00",
+            "members": 338975,
+            "rated": "R"
+        },
+        {
+            "mal_id": 11759,
+            "url": "https:\/\/myanimelist.net\/anime\/11759\/Accel_World",
+            "image_url": "https:\/\/cdn.myanimelist.net\/images\/anime\/8\/38155.jpg?s=3a9cb5e41cb2fde7f332b2c7cb962853",
+            "title": "Accel World",
+            "airing": false,
+            "synopsis": "Haruyuki Arita is an overweight, bullied middle schooler who finds solace in playing online games. But his life takes a drastic turn one day, when he finds that all his high scores have been topped by...",
+            "type": "TV",
+            "episodes": 24,
+            "score": 7.45,
+            "start_date": "2012-04-07T00:00:00+00:00",
+            "end_date": "2012-09-22T00:00:00+00:00",
+            "members": 513295,
+            "rated": "PG-13"
+        }
+    ],
+    "last_page": 1
+}
