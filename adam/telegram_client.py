@@ -3,7 +3,7 @@ import http.client as client
 
 BASE_DOMAIN = 'api.telegram.org'
 BASE_ENCODING = 'utf-8'
-CONTENT_TYPE_HEADER_NAME = '"Content-Type'
+CONTENT_TYPE_HEADER_NAME = 'Content-Type'
 CONTENT_TYPE_APPLICATION_JSON = 'application/json'
 BASE_HEADERS = {CONTENT_TYPE_HEADER_NAME: CONTENT_TYPE_APPLICATION_JSON}
 
