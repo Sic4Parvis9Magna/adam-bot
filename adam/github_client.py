@@ -1,5 +1,5 @@
 import http.client as client
-import github_api_constants as HUB_API
+import adam.github_api_constants as HUB_API
 import json
 import datetime
 import base64
@@ -29,17 +29,17 @@ def get_blob(sha: str) -> dict:
     return make_rest_call(url=url, method=HUB_API.HTTP_GET)
 
 
-def update_blob(body:dict, path:str) -> dict:
+def update_contents(body:dict, path:str) -> dict:
     conn = client.HTTPSConnection(HUB_API.BASE_URL)
-    url = create_put_blob_url(user_name=GIT_USER, repo_name=GIT_REPO, path=path)
+    url = create_put_contents_url(path=path)
     
     headers = {
     HUB_API.USER_AGENT: HUB_API.DUMMY_AGENT,
     HUB_API.AUTHORIZATION: GIT_AUTH}
 
     json_body = json.dumps(body)
-    bytes_body = bytes(json_body,encoding="utf-8")
-    conn.request("PUT", url, headers=headers, body=bytes_body)
+    bytes_body = bytes(json_body,encoding='utf-8')
+    conn.request(method='PUT', url=url, headers=headers, body=bytes_body)
 
     response = conn.getresponse()
     raw_res = response.read()
@@ -54,7 +54,7 @@ def get_blob_content(blob: dict) -> str:
 
 def make_rest_call(url: str, method: str):
     conn = client.HTTPSConnection(HUB_API.BASE_URL)
-    conn.request(method, url, headers={
+    conn.request(method=method, url=url, headers={
                  HUB_API.USER_AGENT: HUB_API.DUMMY_AGENT})
     response = conn.getresponse()
     raw_res = response.read()
@@ -63,8 +63,8 @@ def make_rest_call(url: str, method: str):
     return json_res
 
 
-def find_latest_commit(commits: list) -> str:
-    latest_sha = 'not-found'
+def get_latest_commit_sha(commits: list) -> str:
+    latest_sha = None
     latest_date = None
     for commit in commits:
 
@@ -85,7 +85,7 @@ def find_latest_commit(commits: list) -> str:
 
 
 def get_record_number(content: str) -> str:
-    p = re.compile('Record-(\d{3})', re.MULTILINE)
+    p = re.compile(r'Record-(\d{3})', re.MULTILINE)
     find_items = p.findall(content)
 
     if len(find_items) == 0:
@@ -99,8 +99,10 @@ def get_record_number(content: str) -> str:
         return get_next_int(last_number)
 
 
-def get_next_int(str_number: str) -> int:
+def get_next_int(str_number: str) -> str:
     previous_val = int(str_number)
+    if previous_val < 0:
+        return '000'
     next_number = previous_val + 1
     if next_number < 10:
         return f'00{next_number}'
@@ -110,7 +112,7 @@ def get_next_int(str_number: str) -> int:
         return str(next_number)
 
 
-def get_blob_info(tree: dict, file_name: str) -> dict:
+def find_blob_sha(tree: dict, file_name: str) -> dict:
     compound_path = file_name.split("/")
     file_path = compound_path[len(compound_path) - 1]
 
@@ -121,7 +123,7 @@ def get_blob_info(tree: dict, file_name: str) -> dict:
             if path_part == compound_path[len(compound_path) - 1]:
                 return sha
             else:
-                current_tree = get_tree(sha=sha['sha'])
+                current_tree = get_tree(sha=sha)
         else:
             return None
     
@@ -130,10 +132,7 @@ def get_blob_info(tree: dict, file_name: str) -> dict:
 def get_blob_sha(tree: dict, path_part: str) -> str:
     for blob_item in tree["tree"]:
         if path_part in blob_item["path"]:
-            return {
-                "sha": blob_item["sha"],
-                "path": blob_item["path"]
-            }
+            return blob_item["sha"]
 
     return None
 
@@ -146,14 +145,20 @@ def get_commit_timestamp(commit: dict):
         return datetime.MINYEAR
 
 
-# TODO refactor
 def has_author(commit: dict) -> bool:
-    return True
+    try:
+        commit["commit"]["author"]["date"]
+        return True
+    except KeyError:
+        return False
 
 
-# TODO refactor
 def has_commiter(commit: dict) -> bool:
-    return True
+    try:
+        commit["commit"]["committer"]["date"]
+        return True
+    except KeyError:
+        return False
 
 
 def generate_record(link, number="000", title="undefined", tags=[]) -> str:
@@ -175,16 +180,15 @@ def get_blob_url(sha: str) -> str:
     return HUB_API.GET_BLOB_BY_SHA.format(sha=sha, user=GIT_USER, repo=GIT_REPO)
 
 
-def create_put_blob_url(user_name: str, repo_name: str, path: str) -> str:
+def create_put_contents_url(path: str) -> str:
     return HUB_API.PUT_BLOB.format(user=GIT_USER, repo=GIT_REPO, path=path)
 
 
 def commit_record(file_name: str, record: dict) -> dict:
     commits = get_commits()
-    sha = find_latest_commit(commits=commits)
+    sha = get_latest_commit_sha(commits=commits)
     tree = get_tree(sha=sha)
-    blob_info = get_blob_info(tree=tree, file_name=file_name)
-    blob_sha = blob_info["sha"]
+    blob_sha = find_blob_sha(tree=tree, file_name=file_name)
     blob = get_blob(sha=blob_sha)
     blob_content = get_blob_content(blob)
     
@@ -201,22 +205,22 @@ def commit_record(file_name: str, record: dict) -> dict:
         "content": b64_content
     } 
     
-    result = update_blob(body=body, path=file_name)
+    result = update_contents(body=body, path=file_name)
     return result
 
 def parse_record(text:str) -> dict:
     res_link = None
     res_tags = []
 
-    p_title = re.compile('title:\s?\[([^[]+)\]') 
+    p_title = re.compile(r'title:\s?\[([^[]+)\]') 
     m_title = p_title.findall(text)
     res_title = m_title[0] if m_title  else 'undefined'  
 
-    p_link = re.compile('link:\s?\[([^[]+)\]') 
+    p_link = re.compile(r'link:\s?\[([^[]+)\]') 
     m_link = p_link.findall(text)
     res_link = m_link[0] if m_link  else 'undefined'  
 
-    p_tags = re.compile('#(\w+)') 
+    p_tags = re.compile(r'#(\w+)') 
     m_tags = p_tags.findall(text)
     all_tags = m_tags if m_tags  else []  
 
@@ -230,7 +234,7 @@ def parse_record(text:str) -> dict:
 
 
 def parse_github_path(text: str) -> str:
-    p_title = re.compile('#gitpath:\s?\[([^[]+)\]') 
+    p_title = re.compile(r'#gitpath:\s?\[([^[]+)\]') 
     m_title = p_title.findall(text)
     
     return m_title[0] if m_title  else 'undefined'

@@ -1,1 +1,7 @@
 *.props
+Pipfile.lock
+*/__pycache__/
+
+#coverage
+.coverage
+htmlcov/

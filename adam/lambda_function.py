@@ -3,9 +3,10 @@ from os import getenv
 import http.client as client
 from random import randrange
 
-import constants
-import github_client as github
-from mal_client import get_results_for_genre
+import adam.constants as constants
+import adam.telegram_client as telegram_client
+import adam.github_client as github
+import adam.mal_client as mal
 
 BASE_URL_TEMPLATE = "/bot{token}"
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -19,7 +20,7 @@ GIT_TAG = '#gitpath'
 
 def lambda_handler(event, context):
     body = loads(event['body'])
-    chat_id = body['message']['chat']['id']
+    chat_id = int(body['message']['chat']['id'])
     message = body['message']['text']
 
     try:
@@ -36,14 +37,14 @@ def lambda_handler(event, context):
 
 def handle_incoming_message(message:str, chat_id: int):
     if message.startswith( '/'):
-        resolve_command(message, chat_id)
+        resolve_command(cmd=message, chat_id=chat_id)
     elif GIT_TAG in message:
-        handle_git_commit(message, chat_id)
+        parse_and_commit_record(message=message, chat_id=chat_id)
     else:
-        send_message(message, chat_id)
+        send_message(text=message, chat_id=chat_id)
 
 
-def handle_git_commit(message: str, chat_id: int):
+def parse_and_commit_record(message: str, chat_id: int):
     record = github.parse_record(message)
     github_path = github.parse_github_path(message)
 
@@ -54,7 +55,7 @@ def handle_git_commit(message: str, chat_id: int):
     send_message(text=result_message, chat_id=chat_id)
 
 
-def get_rn_gin() -> str:
+def get_random_gintama_episode_name() -> str:
     series = constants.GIN_LIST
     size = len(series)
     number = randrange(size)
@@ -62,53 +63,38 @@ def get_rn_gin() -> str:
 
 
 def resolve_command(cmd: str, chat_id: int):
-    message = 'Unresolved command =( : ' + cmd 
+    error_message = constants.COMMAND_NOT_FOUND + cmd 
     if SEARCH_COMMAND in cmd:
-        response_message = '\n'.join(get_results_for_genre('Action', 10))
+        results= mal.get_results_for_genre('Action', 10)
+        response_message = '\n'.join(results)
         send_message(text=response_message, chat_id=chat_id)
     elif POLL_COMMAND in cmd:
-        sendGintamaPoll(chat_id=chat_id)
+        generate_and_send_gintama_poll(chat_id=chat_id)
     elif DIRS_COMMAND in cmd:
         result = "\n".join(constants.DIR_LIST)
         send_message(text=result, chat_id=chat_id)
     elif FORMAT_COMMAND in cmd:
         send_message(text=constants.COMMIT_SUBMISSION_FORMAT, chat_id=chat_id)
     else:    
-        send_message(test=message,chat_id=chat_id)
+        send_message(text=error_message,chat_id=chat_id)
 
 
-def send_message(text, chat_id):
+def send_message(text: str, chat_id: int):
     url = BASE_URL + "/sendMessage".format(token=BOT_TOKEN)
     body = {
         "text": text,
         "chat_id": chat_id
     }
-    return make_rest_call(url=url, method='POST', body=body)
+    return telegram_client.make_rest_api_call(url=url, method='POST', body=body)
 
 
-def sendGintamaPoll(chat_id):
+def generate_and_send_gintama_poll(chat_id):
     url = BASE_URL + "/sendPoll".format(token=BOT_TOKEN)
     body = {
         "chat_id" : chat_id,
-        "question": get_rn_gin(),
-        "options": ["Y", "N", "22-30", "23-00", "23-30"],
+        "question": get_random_gintama_episode_name(),
+        "options": ["Y", "N", "22-30", "23-00", "23-15", "23-30"],
         "allows_multiple_answers": True,
         "is_anonymous": False
     }
-    make_rest_call(url=url, method='POST', body=body)
-
-
-def make_rest_call(url: str, method: str, body: dict):
-    conn = client.HTTPSConnection('api.telegram.org')
-    json_body = dumps(body)
-    bytes_body = bytes(json_body,encoding="utf-8")
-
-    headers = {"Content-Type": "application/json"}
-
-    conn.request(method, url, headers=headers, body=bytes_body)
-    response = conn.getresponse()
-    raw_res = response.read()
-    conn.close()
-    json_res = loads(raw_res)
-
-    return json_res
+    telegram_client.make_rest_api_call(url=url, method='POST', body=body)

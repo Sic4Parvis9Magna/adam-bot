@@ -1,0 +1,73 @@
+{
+    "resource": "/",
+    "path": "/",
+    "httpMethod": "POST",
+    "headers": {
+        "Accept-Encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+        "Host": "qce17iy5s6.execute-api.us-east-1.amazonaws.com",
+        "X-Amzn-Trace-Id": "Root=1-5f67b995-dcfa6bae66b2cc49d8487253",
+        "X-Forwarded-For": "91.108.6.105",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Accept-Encoding": [
+            "gzip, deflate"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "Host": [
+            "qce17iy5s6.execute-api.us-east-1.amazonaws.com"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5f67b995-dcfa6bae66b2cc49d8487253"
+        ],
+        "X-Forwarded-For": [
+            "91.108.6.105"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": null,
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "3j56vns3z0",
+        "resourcePath": "/",
+        "httpMethod": "POST",
+        "extendedRequestId": "TLnvcFFyIAMFf2Q=",
+        "requestTime": "20/Sep/2020:20:20:37 +0000",
+        "path": "/V1",
+        "accountId": "051505042743",
+        "protocol": "HTTP/1.1",
+        "stage": "V1",
+        "domainPrefix": "qce17iy5s6",
+        "requestTimeEpoch": 1600633237934,
+        "requestId": "259cca0a-2490-4e4d-8392-530cb60a1e04",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "accountId": null,
+            "cognitoIdentityId": null,
+            "caller": null,
+            "sourceIp": "91.108.6.105",
+            "principalOrgId": null,
+            "accessKey": null,
+            "cognitoAuthenticationType": null,
+            "cognitoAuthenticationProvider": null,
+            "userArn": null,
+            "userAgent": null,
+            "user": null
+        },
+        "domainName": "qce17iy5s6.execute-api.us-east-1.amazonaws.com",
+        "apiId": "qce17iy5s6"
+    },
+    "body": "{\"update_id\":27929913,\n\"message\":{\"message_id\":690,\"from\":{\"id\":362133372,\"is_bot\":false,\"first_name\":\"Evgeniy\",\"last_name\":\"Buchiy\",\"username\":\"e_buchiy\",\"language_code\":\"en\"},\"chat\":{\"id\":42,\"first_name\":\"Evgeniy\",\"last_name\":\"Buchiy\",\"username\":\"e_buchiy\",\"type\":\"private\"},\"date\":1600633237,\"text\":\"test message\"}}",
+    "isBase64Encoded": false
+}
