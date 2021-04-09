@@ -5,11 +5,15 @@ import datetime
 import base64
 import re
 from os import getenv
-# TODO refactor imports
 
 GIT_REPO = getenv("GIT_REPO")
 GIT_USER = getenv("GIT_USER")
 GIT_AUTH = getenv("GIT_AUTH")
+
+BASE_HEADERS = {
+    HUB_API.USER_AGENT: HUB_API.DUMMY_AGENT,
+    HUB_API.AUTHORIZATION: GIT_AUTH
+}
 
 RESERVED_TAGS = ['title', 'link', 'gitpath']
 
@@ -33,13 +37,9 @@ def update_contents(body:dict, path:str) -> dict:
     conn = client.HTTPSConnection(HUB_API.BASE_URL)
     url = create_put_contents_url(path=path)
     
-    headers = {
-    HUB_API.USER_AGENT: HUB_API.DUMMY_AGENT,
-    HUB_API.AUTHORIZATION: GIT_AUTH}
-
     json_body = json.dumps(body)
     bytes_body = bytes(json_body,encoding='utf-8')
-    conn.request(method='PUT', url=url, headers=headers, body=bytes_body)
+    conn.request(method='PUT', url=url, headers=BASE_HEADERS, body=bytes_body)
 
     response = conn.getresponse()
     raw_res = response.read()
@@ -54,8 +54,9 @@ def get_blob_content(blob: dict) -> str:
 
 def make_rest_call(url: str, method: str):
     conn = client.HTTPSConnection(HUB_API.BASE_URL)
-    conn.request(method=method, url=url, headers={
-                 HUB_API.USER_AGENT: HUB_API.DUMMY_AGENT})
+
+    conn.request(method=method, url=url, headers=BASE_HEADERS)
+    
     response = conn.getresponse()
     raw_res = response.read()
     conn.close()
