@@ -12,7 +12,7 @@ from adam.github_client import (get_record_number, get_next_int, filterout_reser
  get_commits, get_tree, get_blob,
  get_blob_content, update_contents, make_rest_call,
  get_record_number, get_blob_sha, find_blob_sha,
- get_latest_commit_sha, commit_record)
+ get_latest_commit_sha, commit_record, BASE_HEADERS)
 import datetime
 
 get_next_int_params = [
@@ -196,7 +196,7 @@ def test_make_rest_call(https_client):
     expected_result = {'foo': 'bar'}
     url = 'dummy/url/path'
     method = 'GET'
-    headers={USER_AGENT: DUMMY_AGENT}
+    headers=BASE_HEADERS
 
     #when
     actual_result = make_rest_call(url=url, method=method)
