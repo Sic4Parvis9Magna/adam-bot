@@ -8,7 +8,7 @@ from adam.lambda_function import (
     lambda_handler, get_random_gintama_episode_name, handle_incoming_message,
      parse_and_commit_record, resolve_command, SEARCH_COMMAND,
      POLL_COMMAND, DIRS_COMMAND, FORMAT_COMMAND,
-     send_message, generate_and_send_gintama_poll)
+     generate_and_send_gintama_poll)
 from adam import constants
 
 
@@ -29,7 +29,7 @@ def test_lambda_handler_should_handle_events(handle_incoming_message_mock):
     assert actual_result == expected_result
 
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 @patch('adam.lambda_function.handle_incoming_message')
 def test_lambda_handler_should_handle_errors(handle_incoming_message_mock, send_message_mock):
     #given
@@ -75,7 +75,7 @@ def test_handle_incoming_message_with_git_tag(parse_and_commit_record_mock):
     parse_and_commit_record_mock.assert_called_once_with(message=message, chat_id=chat_id)
 
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 def test_handle_incoming_message_with_regular_text(send_message_mock):
     #given
     message = 'dummy text'
@@ -87,7 +87,7 @@ def test_handle_incoming_message_with_regular_text(send_message_mock):
     #then
     send_message_mock.assert_called_once_with(text=message, chat_id=chat_id)
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 @patch('adam.github_client.commit_record')
 @patch('adam.github_client.parse_github_path')
 @patch('adam.github_client.parse_record')
@@ -125,7 +125,7 @@ def test_get_random_gintama_episode_name():
     assert actual_result in GIN_LIST
 
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 @patch('adam.mal_client.get_results_for_genre')
 # @pytest.mark.skip(reason="fix needed")
 def test_resolve_command_search(get_results_for_genre_mock, send_message_mock):
@@ -159,7 +159,7 @@ def test_resolve_command_poll(generate_and_send_gintama_poll_mock):
     generate_and_send_gintama_poll_mock.assert_called_once_with(chat_id=chat_id)
 
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 def test_resolve_command_dirs(send_message_mock):
     #given
     expected_text = "\n".join(constants.DIR_LIST)
@@ -172,7 +172,7 @@ def test_resolve_command_dirs(send_message_mock):
     #then
     send_message_mock.assert_called_once_with(text=expected_text, chat_id=chat_id)
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 def test_resolve_command_format(send_message_mock):
     #given
     cmd = '/' + FORMAT_COMMAND 
@@ -185,7 +185,7 @@ def test_resolve_command_format(send_message_mock):
     send_message_mock.assert_called_once_with(text=constants.COMMIT_SUBMISSION_FORMAT, chat_id=chat_id)
 
 
-@patch('adam.lambda_function.send_message')
+@patch('adam.telegram_client.send_message')
 def test_resolve_command_not_found(send_message_mock):
     #given
     cmd = 'dummy text'
@@ -198,19 +198,6 @@ def test_resolve_command_not_found(send_message_mock):
     #then
     send_message_mock.assert_called_once_with(text=expected_text, chat_id=chat_id)
 
-
-@patch('adam.telegram_client.make_rest_api_call')
-def test_send_message(make_rest_api_call_mock):
-    #given
-    text = 'random text'
-    chat_id = 42
-
-    #when
-    send_message(text=text, chat_id=chat_id)
-
-    #then
-    make_rest_api_call_mock.assert_called_once()
-    
 
 @patch('adam.telegram_client.make_rest_api_call')
 def test_generate_and_send_gintama_poll(make_rest_api_call_mock):
