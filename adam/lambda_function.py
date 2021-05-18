@@ -8,9 +8,6 @@ import adam.telegram_client as telegram_client
 import adam.github_client as github
 import adam.mal_client as mal
 
-BASE_URL_TEMPLATE = "/bot{token}"
-BOT_TOKEN = getenv("BOT_TOKEN")
-BASE_URL = BASE_URL_TEMPLATE.format(token=BOT_TOKEN)
 SEARCH_COMMAND = 'search'
 POLL_COMMAND = 'poll'
 DIRS_COMMAND = 'dirs'
@@ -27,7 +24,7 @@ def lambda_handler(event, context):
         handle_incoming_message(message=message, chat_id=chat_id)
     except Exception as e:
         response_text = "Something went wrong! Error log is: {error}".format(error=e)
-        send_message(text=response_text, chat_id=chat_id)
+        telegram_client.send_message(text=response_text, chat_id=chat_id)
         print("Error is: ", e)
     
     return {
@@ -41,7 +38,7 @@ def handle_incoming_message(message:str, chat_id: int):
     elif GIT_TAG in message:
         parse_and_commit_record(message=message, chat_id=chat_id)
     else:
-        send_message(text=message, chat_id=chat_id)
+        telegram_client.send_message(text=message, chat_id=chat_id)
 
 
 def parse_and_commit_record(message: str, chat_id: int):
@@ -52,7 +49,7 @@ def parse_and_commit_record(message: str, chat_id: int):
     
     result_message = "Successfully committed the folllowing record:\n {record}\n to the following file: \n{github_path}".format(record=record, github_path=github_path)
 
-    send_message(text=result_message, chat_id=chat_id)
+    telegram_client.send_message(text=result_message, chat_id=chat_id)
 
 
 def get_random_gintama_episode_name() -> str:
@@ -67,34 +64,20 @@ def resolve_command(cmd: str, chat_id: int):
     if SEARCH_COMMAND in cmd:
         results= mal.get_results_for_genre('Action', 10)
         response_message = '\n'.join(results)
-        send_message(text=response_message, chat_id=chat_id)
+        telegram_client.send_message(text=response_message, chat_id=chat_id)
     elif POLL_COMMAND in cmd:
         generate_and_send_gintama_poll(chat_id=chat_id)
     elif DIRS_COMMAND in cmd:
         result = "\n".join(constants.DIR_LIST)
-        send_message(text=result, chat_id=chat_id)
+        telegram_client.send_message(text=result, chat_id=chat_id)
     elif FORMAT_COMMAND in cmd:
-        send_message(text=constants.COMMIT_SUBMISSION_FORMAT, chat_id=chat_id)
+        telegram_client.send_message(text=constants.COMMIT_SUBMISSION_FORMAT, chat_id=chat_id)
     else:    
-        send_message(text=error_message,chat_id=chat_id)
-
-
-def send_message(text: str, chat_id: int):
-    url = BASE_URL + "/sendMessage".format(token=BOT_TOKEN)
-    body = {
-        "text": text,
-        "chat_id": chat_id
-    }
-    return telegram_client.make_rest_api_call(url=url, method='POST', body=body)
+        telegram_client.send_message(text=error_message,chat_id=chat_id)
 
 
 def generate_and_send_gintama_poll(chat_id):
-    url = BASE_URL + "/sendPoll".format(token=BOT_TOKEN)
-    body = {
-        "chat_id" : chat_id,
-        "question": get_random_gintama_episode_name(),
-        "options": ["Y", "N", "22-30", "23-00", "23-15", "23-30"],
-        "allows_multiple_answers": True,
-        "is_anonymous": False
-    }
-    telegram_client.make_rest_api_call(url=url, method='POST', body=body)
+    question = get_random_gintama_episode_name(),
+    options_list = ["Y", "N", "22-30", "23-00", "23-15", "23-30"]
+    
+    telegram_client.send_poll(chat_id=chat_id, question=question, options=options_list, allow_multiple_answers=True, is_anonymous=False)
